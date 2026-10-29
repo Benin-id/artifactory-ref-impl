@@ -12,9 +12,10 @@ ARG container_user_uid=1001
 # can be passed during Docker build as build time environment for github branch to pickup configuration from.
 ARG container_user_gid=1001
 
-# Configure Debian Bullseye repositories
+# Use archived Debian Bullseye repositories
 RUN sed -i \
-    's|http://deb.debian.org/debian-security|https://security.debian.org/debian-security|g' \
+    -e 's|http://deb.debian.org/debian-security|https://archive.debian.org/debian-security|g' \
+    -e 's|https://security.debian.org/debian-security|https://archive.debian.org/debian-security|g' \
     /etc/apt/sources.list && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
