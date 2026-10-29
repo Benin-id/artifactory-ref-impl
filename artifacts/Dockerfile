@@ -12,18 +12,27 @@ ARG container_user_uid=1001
 # can be passed during Docker build as build time environment for github branch to pickup configuration from.
 ARG container_user_gid=1001
 
-# install packages and create user
-RUN rm -rf /var/lib/apt/lists/* && \
-apt-get clean && \
-apt-get update -y && \
-apt-get install -y --no-install-recommends gnupg2 unzip wget zip openjdk-11-jdk && \
+# Configure Debian Bullseye repositories
+RUN sed -i \
+    's|http://deb.debian.org/debian-security|https://security.debian.org/debian-security|g' \
+    /etc/apt/sources.list && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get clean
+
+# Install packages and create MOSIP user
+RUN apt-get update -y && \
+    apt-get install -y --no-install-recommends \
+        gnupg2 unzip wget zip openjdk-11-jdk ca-certificates && \
     groupadd -g ${container_user_gid} ${container_user_group} && \
-rm -rf /var/lib/apt/lists/* && \
-wget https://archive.apache.org/dist/maven/maven-3/3.8.9/binaries/apache-maven-3.8.9-bin.tar.gz && \
-tar -xzf apache-maven-3.8.9-bin.tar.gz && mv apache-maven-3.8.9 /usr/local/maven && rm apache-maven-3.8.9-bin.tar.gz && \
-useradd -u ${container_user_uid} -g ${container_user_group} -s /bin/sh -m ${container_user} \
-&& mkdir -p /var/run/nginx /var/tmp/nginx \
-&& chown -R ${container_user}:${container_user} /usr/share/nginx /var/run/nginx /var/tmp/nginx
+    rm -rf /var/lib/apt/lists/* && \
+    wget https://archive.apache.org/dist/maven/maven-3/3.8.9/binaries/apache-maven-3.8.9-bin.tar.gz && \
+    tar -xzf apache-maven-3.8.9-bin.tar.gz && \
+    mv apache-maven-3.8.9 /usr/local/maven && \
+    rm apache-maven-3.8.9-bin.tar.gz && \
+    useradd -u ${container_user_uid} -g ${container_user_group} -s /bin/sh -m ${container_user} && \
+    mkdir -p /var/run/nginx /var/tmp/nginx && \
+    chown -R ${container_user}:${container_user} \
+        /usr/share/nginx /var/run/nginx /var/tmp/nginx
 
 COPY ./nginx.conf /etc/nginx/nginx.conf
 
