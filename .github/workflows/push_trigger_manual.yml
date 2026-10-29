@@ -20,6 +20,13 @@ jobs:
         run: |
           echo "BRANCH_NAME=$(echo ${{ github.ref }} | sed -e 's,.*/\(.*\),\1,')" >> $GITHUB_ENV
           echo "GPG_TTY=$(tty)" >> $GITHUB_ENV
+      - name: Test Debian Bullseye repositories
+        run: |
+          docker run --rm \
+            nginx@sha256:af296b188c7b7df99ba960ca614439c99cb7cf252ed7bbc23e90cfda59092305 \
+            sh -c "sed -i 's|http://deb.debian.org/debian-security|https://security.debian.org/debian-security|g' /etc/apt/sources.list && \
+                   apt-get update && \
+                   apt-get install -y --no-install-recommends gnupg2 unzip wget zip openjdk-11-jdk ca-certificates"
 
       - name: Build image
         run: |
