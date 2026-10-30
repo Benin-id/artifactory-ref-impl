@@ -92,6 +92,10 @@ ENV hsm_client_path=${base_path}/libs-release-local/hsm
 # environment variable for mosip-plugins zip path
 ENV mosip_plugins_zip_path=${base_path}/libs-release-local/mosip-plugins
 
+# environment variable for custom-impl jar path
+ENV custom_zip_path=${base_path}/libs-release-local/impl
+COPY /src/impl/* ${custom_zip_path}/
+
 # environment valiable for sdk jar
 ENV sdk_path=${base_path}/libs-release-local/mock-sdk/1.1.5/
 
